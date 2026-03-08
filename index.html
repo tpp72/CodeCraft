@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeCraft Studio</title>
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <script src="https://unpkg.com/@zxing/library@latest"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">C</div>
+      <div class="brand-text">
+        <h1>CodeCraft Studio</h1>
+        <p>สร้างและสแกน Barcode / QR Code</p>
+      </div>
+    </div>
+
+    <nav class="navbar">
+      <button class="nav-btn active" data-target="barcodeSection">สร้าง Barcode</button>
+      <button class="nav-btn" data-target="qrcodeSection">สร้าง QR Code</button>
+      <button class="nav-btn" data-target="scannerSection">สแกนรูป</button>
+    </nav>
+    <button id="themeToggle" class="theme-toggle">🌙</button>
+  </header>
+
+  <main class="page-wrap">
+    <!-- Barcode -->
+    <section class="panel active" id="barcodeSection">
+      <div class="card">
+        <div class="card-header">
+          <h2>สร้าง Barcode</h2>
+          <p>กรอกข้อความเพื่อสร้าง Barcode และดาวน์โหลดเป็น PNG</p>
+        </div>
+
+        <div class="card-body">
+          <label class="label" for="barcodeInput">ข้อความสำหรับ Barcode</label>
+          <input type="text" id="barcodeInput" class="input" placeholder="เช่น PRODUCT-001"/>
+
+          <div class="button-row">
+            <button id="generateBarcodeButton" class="btn btn-primary">สร้าง Barcode</button>
+            <button id="downloadBarcodeButton" class="btn btn-outline">ดาวน์โหลด PNG</button>
+          </div>
+
+          <div class="preview-box">
+            <canvas id="barcodeCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QR Code -->
+    <section class="panel" id="qrcodeSection">
+      <div class="card">
+        <div class="card-header">
+          <h2>สร้าง QR Code</h2>
+          <p>กรอกข้อความหรือลิงก์เพื่อสร้าง QR Code และดาวน์โหลดเป็น PNG</p>
+        </div>
+
+        <div class="card-body">
+          <label class="label" for="qrInput">ข้อความสำหรับ QR Code</label>
+          <input type="text" id="qrInput" class="input" placeholder="เช่น https://example.com"/>
+
+          <div class="button-row">
+            <button id="generateQRButton" class="btn btn-primary">สร้าง QR Code</button>
+            <button id="downloadQRButton" class="btn btn-outline">ดาวน์โหลด PNG</button>
+          </div>
+
+          <div class="preview-box qr-preview-box">
+            <canvas id="qrCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scanner -->
+    <section class="panel" id="scannerSection">
+      <div class="card">
+        <div class="card-header">
+          <h2>สแกนจากรูปภาพ</h2>
+          <p>อัปโหลดรูปเพื่ออ่าน Barcode หรือ QR Code ย้อนกลับ</p>
+        </div>
+
+        <div class="card-body">
+          <label class="label" for="imageInput">อัปโหลดรูปภาพ</label>
+          <input type="file" id="imageInput" class="input file-input" accept="image/*" />
+
+          <div class="button-row">
+            <button id="scanImageButton" class="btn btn-primary">อ่านโค้ดจากรูป</button>
+          </div>
+
+          <div class="image-preview-box">
+            <img id="previewImage" alt="Preview" />
+            <div id="emptyPreviewText" class="empty-preview-text">ยังไม่มีรูปที่อัปโหลด</div>
+          </div>
+
+          <label class="label" for="scanResult">ผลลัพธ์ที่อ่านได้</label>
+          <input type="text" id="scanResult" class="input" placeholder="ผลลัพธ์จะแสดงที่นี่" readonly/>
+
+          <canvas id="hiddenCanvas" hidden></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
