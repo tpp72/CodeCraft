@@ -69,7 +69,7 @@ generateQRButton.addEventListener("click", async () => {
     });
   } catch (error) {
     console.error(error);
-    alert("ไม่สามารถสร้าง QR Code ได้");
+    alert(`ไม่สามารถสร้าง QR Code ได้: ${error.message || error}`);
   }
 });
 
