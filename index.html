@@ -8,7 +8,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
   <script src="qrcode.min.js"></script>
-  <script src="https://unpkg.com/@zxing/library@latest"></script>
+  <script src="https://unpkg.com/@zxing/library@0.23.0"></script>
 </head>
 <body>
   <header class="topbar">
@@ -23,7 +23,8 @@
     <nav class="navbar">
       <button class="nav-btn active" data-target="barcodeSection">สร้าง Barcode</button>
       <button class="nav-btn" data-target="qrcodeSection">สร้าง QR Code</button>
-      <button class="nav-btn" data-target="scannerSection">สแกนรูป</button>
+      <button class="nav-btn" data-target="scannerSection">อ่าน Barcode</button>
+      <button class="nav-btn" data-target="qrReaderSection">อ่าน QR Code</button>
     </nav>
     <button id="themeToggle" class="theme-toggle">🌙</button>
   </header>
@@ -81,8 +82,8 @@
     <section class="panel" id="scannerSection">
       <div class="card">
         <div class="card-header">
-          <h2>สแกนจากรูปภาพ</h2>
-          <p>อัปโหลดรูปเพื่ออ่าน Barcode หรือ QR Code ย้อนกลับ</p>
+          <h2>อ่าน Barcode</h2>
+          <p>อัปโหลดรูปเพื่ออ่าน Barcode ย้อนกลับ</p>
         </div>
 
         <div class="card-body">
@@ -102,6 +103,44 @@
           <input type="text" id="scanResult" class="input" placeholder="ผลลัพธ์จะแสดงที่นี่" readonly/>
 
           <canvas id="hiddenCanvas" hidden></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- QR Reader -->
+    <section class="panel" id="qrReaderSection">
+      <div class="card">
+        <div class="card-header">
+          <h2>อ่าน QR Code</h2>
+          <p>สแกนผ่านกล้อง หรืออัปโหลดรูปเพื่ออ่าน QR Code</p>
+        </div>
+
+        <div class="card-body">
+          <div class="button-row">
+            <button id="startCameraButton" class="btn btn-primary">เปิดกล้องสแกน</button>
+            <button id="stopCameraButton" class="btn btn-outline" disabled>หยุดกล้อง</button>
+          </div>
+
+          <div class="preview-box camera-preview-box">
+            <video id="qrVideo" muted playsinline></video>
+          </div>
+
+          <label class="label" for="qrReaderResult">ผลลัพธ์ที่อ่านได้</label>
+          <input type="text" id="qrReaderResult" class="input" placeholder="ผลลัพธ์จะแสดงที่นี่" readonly/>
+
+          <label class="label" for="qrImageInput">หรืออัปโหลดรูปภาพ</label>
+          <input type="file" id="qrImageInput" class="input file-input" accept="image/*" />
+
+          <div class="button-row">
+            <button id="scanQRImageButton" class="btn btn-primary">อ่าน QR Code จากรูป</button>
+          </div>
+
+          <div class="image-preview-box">
+            <img id="qrPreviewImage" alt="Preview" />
+            <div id="qrEmptyPreviewText" class="empty-preview-text">ยังไม่มีรูปที่อัปโหลด</div>
+          </div>
+
+          <canvas id="qrHiddenCanvas" hidden></canvas>
         </div>
       </div>
     </section>

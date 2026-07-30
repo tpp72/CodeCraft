@@ -192,6 +192,12 @@ body {
   transform: translateY(0);
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn-primary {
   color: #fff;
   background: linear-gradient(135deg, #ff8fc7, #8ab6ff);
@@ -222,6 +228,18 @@ body {
 
 .qr-preview-box {
   min-height: 320px;
+}
+
+.camera-preview-box {
+  min-height: 320px;
+  margin-bottom: 24px;
+}
+
+#qrVideo {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 18px;
+  background: #000;
 }
 
 #barcodeCanvas,

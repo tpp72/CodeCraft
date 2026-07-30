@@ -8,6 +8,10 @@ navButtons.forEach((button) => {
 
     button.classList.add("active");
     document.getElementById(button.dataset.target).classList.add("active");
+
+    if (button.dataset.target !== "qrReaderSection") {
+      stopQRCamera();
+    }
   });
 });
 
@@ -116,6 +120,21 @@ imageInput.addEventListener("change", (event) => {
   reader.readAsDataURL(file);
 });
 
+const barcodeHints = new Map();
+barcodeHints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+  ZXing.BarcodeFormat.CODE_128,
+  ZXing.BarcodeFormat.CODE_39,
+  ZXing.BarcodeFormat.CODE_93,
+  ZXing.BarcodeFormat.EAN_13,
+  ZXing.BarcodeFormat.EAN_8,
+  ZXing.BarcodeFormat.UPC_A,
+  ZXing.BarcodeFormat.UPC_E,
+  ZXing.BarcodeFormat.ITF,
+  ZXing.BarcodeFormat.CODABAR
+]);
+const barcodeReader = new ZXing.MultiFormatReader();
+barcodeReader.setHints(barcodeHints);
+
 scanImageButton.addEventListener("click", () => {
   if (!previewImage.src) {
     alert("กรุณาอัปโหลดรูปก่อน");
@@ -134,22 +153,121 @@ scanImageButton.addEventListener("click", () => {
       const binaryBitmap = new ZXing.BinaryBitmap(
         new ZXing.HybridBinarizer(luminanceSource)
       );
-      const result = new ZXing.MultiFormatReader().decode(binaryBitmap);
+      const result = barcodeReader.decode(binaryBitmap);
 
       scanResult.value = result.text;
 
       if (result.text) {
         barcodeInput.value = result.text;
-        qrInput.value = result.text;
       }
     } catch (error) {
       console.error(error);
       scanResult.value = "";
-      alert("ไม่พบ Barcode หรือ QR Code ในรูปนี้");
+      alert("ไม่พบ Barcode ในรูปนี้");
     }
   };
 
   img.src = previewImage.src;
+});
+
+// QR Reader
+const qrReaderResult = document.getElementById("qrReaderResult");
+const qrVideo = document.getElementById("qrVideo");
+const startCameraButton = document.getElementById("startCameraButton");
+const stopCameraButton = document.getElementById("stopCameraButton");
+const qrImageInput = document.getElementById("qrImageInput");
+const qrPreviewImage = document.getElementById("qrPreviewImage");
+const qrEmptyPreviewText = document.getElementById("qrEmptyPreviewText");
+const scanQRImageButton = document.getElementById("scanQRImageButton");
+const qrHiddenCanvas = document.getElementById("qrHiddenCanvas");
+
+const qrCameraReader = new ZXing.BrowserQRCodeReader();
+let qrCameraActive = false;
+
+function stopQRCamera() {
+  if (!qrCameraActive) return;
+  qrCameraReader.reset();
+  qrCameraActive = false;
+  startCameraButton.disabled = false;
+  stopCameraButton.disabled = true;
+}
+
+startCameraButton.addEventListener("click", () => {
+  qrReaderResult.value = "";
+  startCameraButton.disabled = true;
+  stopCameraButton.disabled = false;
+  qrCameraActive = true;
+
+  qrCameraReader
+    .decodeFromVideoDevice(undefined, qrVideo, (result) => {
+      if (result) {
+        qrReaderResult.value = result.text;
+        qrInput.value = result.text;
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      alert("ไม่สามารถเปิดกล้องได้ กรุณาอนุญาตการใช้งานกล้อง");
+      stopQRCamera();
+    });
+});
+
+stopCameraButton.addEventListener("click", stopQRCamera);
+
+qrImageInput.addEventListener("change", (event) => {
+  const file = event.target.files[0];
+
+  if (!file) {
+    qrPreviewImage.src = "";
+    qrPreviewImage.style.display = "none";
+    qrEmptyPreviewText.style.display = "block";
+    qrReaderResult.value = "";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    qrPreviewImage.src = e.target.result;
+    qrPreviewImage.style.display = "block";
+    qrEmptyPreviewText.style.display = "none";
+    qrReaderResult.value = "";
+  };
+  reader.readAsDataURL(file);
+});
+
+scanQRImageButton.addEventListener("click", () => {
+  if (!qrPreviewImage.src) {
+    alert("กรุณาอัปโหลดรูปก่อน");
+    return;
+  }
+
+  const img = new Image();
+  img.onload = () => {
+    const ctx = qrHiddenCanvas.getContext("2d");
+    qrHiddenCanvas.width = img.naturalWidth;
+    qrHiddenCanvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+
+    try {
+      const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(qrHiddenCanvas);
+      const binaryBitmap = new ZXing.BinaryBitmap(
+        new ZXing.HybridBinarizer(luminanceSource)
+      );
+      const result = new ZXing.QRCodeReader().decode(binaryBitmap);
+
+      qrReaderResult.value = result.text;
+
+      if (result.text) {
+        qrInput.value = result.text;
+      }
+    } catch (error) {
+      console.error(error);
+      qrReaderResult.value = "";
+      alert("ไม่พบ QR Code ในรูปนี้");
+    }
+  };
+
+  img.src = qrPreviewImage.src;
 });
 
 function sanitizeFileName(name) {
