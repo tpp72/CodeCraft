@@ -211,8 +211,7 @@ body {
   box-shadow: 0 10px 24px rgba(119, 136, 173, 0.09);
 }
 
-.preview-box,
-.image-preview-box {
+.preview-box {
   width: 100%;
   min-height: 260px;
   border-radius: 24px;
@@ -245,20 +244,6 @@ body {
 #barcodeCanvas,
 #qrCanvas {
   max-width: 100%;
-}
-
-#previewImage {
-  max-width: 100%;
-  max-height: 420px;
-  border-radius: 18px;
-  display: none;
-  box-shadow: 0 14px 30px rgba(80, 98, 140, 0.14);
-}
-
-.empty-preview-text {
-  color: #8190ab;
-  text-align: center;
-  line-height: 1.6;
 }
 
 /* Theme toggle button */
@@ -299,8 +284,7 @@ body.dark .input{
   color:#fff;
 }
 
-body.dark .preview-box,
-body.dark .image-preview-box{
+body.dark .preview-box{
   background:#1e1e1e;
   border-color:#333;
 }

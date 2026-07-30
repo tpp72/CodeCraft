@@ -93,31 +93,12 @@ downloadQRButton.addEventListener("click", () => {
 
 // Scanner
 const imageInput = document.getElementById("imageInput");
-const previewImage = document.getElementById("previewImage");
-const emptyPreviewText = document.getElementById("emptyPreviewText");
 const scanImageButton = document.getElementById("scanImageButton");
 const scanResult = document.getElementById("scanResult");
 const hiddenCanvas = document.getElementById("hiddenCanvas");
 
-imageInput.addEventListener("change", (event) => {
-  const file = event.target.files[0];
-
-  if (!file) {
-    previewImage.src = "";
-    previewImage.style.display = "none";
-    emptyPreviewText.style.display = "block";
-    scanResult.value = "";
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    previewImage.src = e.target.result;
-    previewImage.style.display = "block";
-    emptyPreviewText.style.display = "none";
-    scanResult.value = "";
-  };
-  reader.readAsDataURL(file);
+imageInput.addEventListener("change", () => {
+  scanResult.value = "";
 });
 
 const barcodeHints = new Map();
@@ -136,38 +117,43 @@ const barcodeReader = new ZXing.MultiFormatReader();
 barcodeReader.setHints(barcodeHints);
 
 scanImageButton.addEventListener("click", () => {
-  if (!previewImage.src) {
+  const file = imageInput.files[0];
+
+  if (!file) {
     alert("กรุณาอัปโหลดรูปก่อน");
     return;
   }
 
-  const img = new Image();
-  img.onload = () => {
-    const ctx = hiddenCanvas.getContext("2d");
-    hiddenCanvas.width = img.naturalWidth;
-    hiddenCanvas.height = img.naturalHeight;
-    ctx.drawImage(img, 0, 0);
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const ctx = hiddenCanvas.getContext("2d");
+      hiddenCanvas.width = img.naturalWidth;
+      hiddenCanvas.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
 
-    try {
-      const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(hiddenCanvas);
-      const binaryBitmap = new ZXing.BinaryBitmap(
-        new ZXing.HybridBinarizer(luminanceSource)
-      );
-      const result = barcodeReader.decode(binaryBitmap);
+      try {
+        const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(hiddenCanvas);
+        const binaryBitmap = new ZXing.BinaryBitmap(
+          new ZXing.HybridBinarizer(luminanceSource)
+        );
+        const result = barcodeReader.decode(binaryBitmap);
 
-      scanResult.value = result.text;
+        scanResult.value = result.text;
 
-      if (result.text) {
-        barcodeInput.value = result.text;
+        if (result.text) {
+          barcodeInput.value = result.text;
+        }
+      } catch (error) {
+        console.error(error);
+        scanResult.value = "";
+        alert("ไม่พบ Barcode ในรูปนี้");
       }
-    } catch (error) {
-      console.error(error);
-      scanResult.value = "";
-      alert("ไม่พบ Barcode ในรูปนี้");
-    }
+    };
+    img.src = e.target.result;
   };
-
-  img.src = previewImage.src;
+  reader.readAsDataURL(file);
 });
 
 // QR Reader
@@ -176,8 +162,6 @@ const qrVideo = document.getElementById("qrVideo");
 const startCameraButton = document.getElementById("startCameraButton");
 const stopCameraButton = document.getElementById("stopCameraButton");
 const qrImageInput = document.getElementById("qrImageInput");
-const qrPreviewImage = document.getElementById("qrPreviewImage");
-const qrEmptyPreviewText = document.getElementById("qrEmptyPreviewText");
 const scanQRImageButton = document.getElementById("scanQRImageButton");
 const qrHiddenCanvas = document.getElementById("qrHiddenCanvas");
 
@@ -214,60 +198,48 @@ startCameraButton.addEventListener("click", () => {
 
 stopCameraButton.addEventListener("click", stopQRCamera);
 
-qrImageInput.addEventListener("change", (event) => {
-  const file = event.target.files[0];
+qrImageInput.addEventListener("change", () => {
+  qrReaderResult.value = "";
+});
+
+scanQRImageButton.addEventListener("click", () => {
+  const file = qrImageInput.files[0];
 
   if (!file) {
-    qrPreviewImage.src = "";
-    qrPreviewImage.style.display = "none";
-    qrEmptyPreviewText.style.display = "block";
-    qrReaderResult.value = "";
+    alert("กรุณาอัปโหลดรูปก่อน");
     return;
   }
 
   const reader = new FileReader();
   reader.onload = (e) => {
-    qrPreviewImage.src = e.target.result;
-    qrPreviewImage.style.display = "block";
-    qrEmptyPreviewText.style.display = "none";
-    qrReaderResult.value = "";
+    const img = new Image();
+    img.onload = () => {
+      const ctx = qrHiddenCanvas.getContext("2d");
+      qrHiddenCanvas.width = img.naturalWidth;
+      qrHiddenCanvas.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
+
+      try {
+        const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(qrHiddenCanvas);
+        const binaryBitmap = new ZXing.BinaryBitmap(
+          new ZXing.HybridBinarizer(luminanceSource)
+        );
+        const result = new ZXing.QRCodeReader().decode(binaryBitmap);
+
+        qrReaderResult.value = result.text;
+
+        if (result.text) {
+          qrInput.value = result.text;
+        }
+      } catch (error) {
+        console.error(error);
+        qrReaderResult.value = "";
+        alert("ไม่พบ QR Code ในรูปนี้");
+      }
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
-});
-
-scanQRImageButton.addEventListener("click", () => {
-  if (!qrPreviewImage.src) {
-    alert("กรุณาอัปโหลดรูปก่อน");
-    return;
-  }
-
-  const img = new Image();
-  img.onload = () => {
-    const ctx = qrHiddenCanvas.getContext("2d");
-    qrHiddenCanvas.width = img.naturalWidth;
-    qrHiddenCanvas.height = img.naturalHeight;
-    ctx.drawImage(img, 0, 0);
-
-    try {
-      const luminanceSource = new ZXing.HTMLCanvasElementLuminanceSource(qrHiddenCanvas);
-      const binaryBitmap = new ZXing.BinaryBitmap(
-        new ZXing.HybridBinarizer(luminanceSource)
-      );
-      const result = new ZXing.QRCodeReader().decode(binaryBitmap);
-
-      qrReaderResult.value = result.text;
-
-      if (result.text) {
-        qrInput.value = result.text;
-      }
-    } catch (error) {
-      console.error(error);
-      qrReaderResult.value = "";
-      alert("ไม่พบ QR Code ในรูปนี้");
-    }
-  };
-
-  img.src = qrPreviewImage.src;
 });
 
 function sanitizeFileName(name) {
